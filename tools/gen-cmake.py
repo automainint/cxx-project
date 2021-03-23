@@ -79,59 +79,51 @@ def clean_subdirs(folder):
       if file == 'CMakeLists.txt':
         os.remove(os.path.join(r, file))
 
+clean_subdirs(os.path.join('..', 'source'))
+write_subdirs(os.path.join('..', 'source'))
+
 out = open(os.path.join('..', 'CMakeLists.txt'), 'w')
 
 out.write('cmake_minimum_required(VERSION 3.18)\n\n')
 
-out.write('set(PROJECT_NAME cxx-project)\n')
-out.write('set(EXE_NAME cxx-project)\n\n')
-
 out.write('option(CODE_COVERAGE "Enable coverage reporting" OFF)\n\n')
+
+out.write('set(PROJECT_NAME cxx-project)\n')
+out.write('set(EXE_NAME cxx-project)\n')
+out.write('set(CFG_COVERAGE config-coverage)\n\n')
 
 out.write('project(${PROJECT_NAME} CXX)\n\n')
 
 out.write('find_package(Threads REQUIRED)\n\n')
 
-out.write('add_executable(${EXE_NAME})\n\n')
+out.write('add_library(${CFG_COVERAGE} INTERFACE)\n\n')
 
-#yawo_added
-out.write('add_library(coverage_config INTERFACE)\n\n')
 out.write('if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")\n')
-out.write('  target_compile_options(coverage_config INTERFACE -O0 -g --coverage)\n\n')
-out.write('  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)\n')
-out.write('    target_link_options(coverage_config INTERFACE --coverage)\n')
-out.write('  else()\n')
-out.write('    target_link_libraries(coverage_config INTERFACE --coverage)\n')
-out.write('  endif()\n')
-out.write('endif(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")\n\n')
+out.write('  target_compile_options(${CFG_COVERAGE} INTERFACE -O0 -g --coverage)\n')
+out.write('  target_link_options(${CFG_COVERAGE} INTERFACE --coverage)\n')
+out.write('endif()\n\n')
 
 out.write('add_library(Sockets INTERFACE)\n\n')
 
-out.write('set_property(\n')
-out.write('  TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 20\n')
-out.write(')\n\n')
-
-out.write('if(MSVC)\n')
-out.write('  set_target_properties(\n')
-out.write('    ${EXE_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE"\n')
-out.write('  )\n')
-out.write('endif()\n\n')
-
 out.write('if(WIN32)\n')
-out.write('  add_compile_definitions(_CONSOLE UNICODE _UNICODE)\n\n')
-out.write('  target_link_libraries(\n')
-out.write('    Sockets INTERFACE ws2_32\n')
-out.write('  )\n')
+out.write('  target_compile_definitions(Sockets INTERFACE _CONSOLE UNICODE _UNICODE)\n')
+out.write('  target_link_libraries(Sockets INTERFACE ws2_32)\n')
 out.write('endif()\n\n')
+
+out.write('add_executable(${EXE_NAME})\n\n')
 
 out.write('add_subdirectory(source)\n\n')
 
-clean_subdirs(os.path.join('..', 'source'))
-write_subdirs(os.path.join('..', 'source'))
+out.write('set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 20)\n\n')
+
+out.write('if(MSVC)\n')
+out.write('  target_link_options(${EXE_NAME} PRIVATE "/SUBSYSTEM:CONSOLE")\n')
+out.write('endif()\n\n')
 
 out.write('target_link_libraries(\n  ${EXE_NAME}\n')
 
-deps = list();
+deps = [ '${CFG_COVERAGE}' ]
+
 libs = open('libs.txt', 'r')
 for line in libs:
   deps.extend(line.split())
