@@ -1,6 +1,6 @@
 # cxx-project
 
-[![build-and-test](https://github.com/automainint/cxx-project/workflows/build-and-test/badge.svg)](https://github.com/automainint/cxx-project/actions?query=workflow%3Abuild-and-test)
+[![build-and-test][build-badge]][build-link]
 [![codecov][codecov-badge]][codecov-link]
 
 C++ project template.
@@ -24,5 +24,7 @@ Use `tools/build-deps.py` to build the dependencies.
 
 Add `source` to the project and build manually. Required headers will be in `include` folder, libraries will be in `lib` folder.
 
-[codecov-badge]:   https://codecov.io/gh/automainint/cxx-project/branch/feature-codecov/graph/badge.svg
-[codecov-link]:    https://codecov.io/gh/automainint/cxx-project
+[build-badge]:    https://github.com/automainint/cxx-project/workflows/build-and-test/badge.svg
+[build-link]:     https://github.com/automainint/cxx-project/actions?query=workflow%3Abuild-and-test
+[codecov-badge]:  https://codecov.io/gh/automainint/cxx-project/branch/feature-codecov/graph/badge.svg
+[codecov-link]:   https://codecov.io/gh/automainint/cxx-project
