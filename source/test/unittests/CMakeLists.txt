@@ -1,5 +1,5 @@
 target_sources(
-  ${EXE_NAME}
+  ${CXXP_EXE}
     PRIVATE
       test.cpp
 )

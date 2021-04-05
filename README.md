@@ -6,21 +6,31 @@
 C++ project template.
 
 ##  How to build
-To build the project CMake and Python 3 are required.
+CMake is required to build the project.
 
-### With CMake
+### With provided build script
 Execute `build.py`.
 
-    python3 build.py
+```shell
+python3 build.py
+```
 
 Done!
+
+### With CMake
+```shell
+cmake -D CMAKE_BUILD_TYPE=Release -B build -S .
+cmake --build build --config Release
+```  
 
 ### By hand
 Use `tools/build-deps.py` to build the dependencies.
 
-    cd tools
-    python3 build-deps.py
-    cd ..
+```shell
+cd tools
+python3 build-deps.py
+cd ..
+```
 
 Add `source` to the project and build manually. Required headers will be in `include` folder, libraries will be in `lib` folder.
 
