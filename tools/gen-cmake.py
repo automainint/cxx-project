@@ -2,6 +2,8 @@
 
 import os, glob
 
+target_name = "${CXXP_EXE}"
+
 def get_subdirs(folder):
   dirs = list()
   for f in glob.glob(os.path.join(folder, '*', '')):
@@ -42,7 +44,7 @@ def print_sources(folder):
   srcs = get_files(folder, '*.cpp')
   hdrs = get_files(folder, '*.h')
   if len(srcs) > 0 or len(hdrs) > 0:
-    buf += 'target_sources(\n  ${EXE_NAME}'
+    buf += 'target_sources(\n  ' + target_name
     if len(srcs) > 0:
       buf += '\n    PRIVATE\n' + print_list(srcs, 6)
     if len(hdrs) > 0:
@@ -81,67 +83,3 @@ def clean_subdirs(folder):
 
 clean_subdirs(os.path.join('..', 'source'))
 write_subdirs(os.path.join('..', 'source'))
-
-out = open(os.path.join('..', 'CMakeLists.txt'), 'w')
-
-out.write('cmake_minimum_required(VERSION 3.18)\n\n')
-
-out.write('option(CODE_COVERAGE "Enable coverage reporting" OFF)\n\n')
-
-out.write('set(PROJECT_NAME cxx-project)\n')
-out.write('set(EXE_NAME cxx-project)\n')
-out.write('set(CFG_COVERAGE config-coverage)\n\n')
-
-out.write('project(${PROJECT_NAME} CXX)\n\n')
-
-out.write('find_package(Threads REQUIRED)\n\n')
-
-out.write('add_library(${CFG_COVERAGE} INTERFACE)\n\n')
-
-out.write('if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")\n')
-out.write('  target_compile_options(${CFG_COVERAGE} INTERFACE -O0 -g --coverage)\n')
-out.write('  target_link_options(${CFG_COVERAGE} INTERFACE --coverage)\n')
-out.write('endif()\n\n')
-
-out.write('add_library(Sockets INTERFACE)\n\n')
-
-out.write('if(WIN32)\n')
-out.write('  target_compile_definitions(Sockets INTERFACE _CONSOLE UNICODE _UNICODE)\n')
-out.write('  target_link_libraries(Sockets INTERFACE ws2_32)\n')
-out.write('endif()\n\n')
-
-out.write('add_executable(${EXE_NAME})\n\n')
-
-out.write('add_subdirectory(source)\n\n')
-
-out.write('set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 20)\n\n')
-
-out.write('if(MSVC)\n')
-out.write('  target_link_options(${EXE_NAME} PRIVATE "/SUBSYSTEM:CONSOLE")\n')
-out.write('endif()\n\n')
-
-out.write('target_link_libraries(\n  ${EXE_NAME}\n')
-
-deps = [ '${CFG_COVERAGE}' ]
-
-libs = open('libs.txt', 'r')
-for line in libs:
-  deps.extend(line.split())
-libs.close()
-
-out.write(print_list(deps, 4))
-out.write('\n)\n\n')
-
-out.write('target_link_directories(\n  ${EXE_NAME}\n')
-out.write('    PUBLIC lib\n')
-out.write(')\n\n')
-
-out.write('target_include_directories(\n  ${EXE_NAME}\n')
-out.write('    PUBLIC include\n')
-out.write(')\n\n')
-
-out.write('enable_testing()\n\n')
-out.write('add_test(\n')
-out.write('  NAME unittests\n')
-out.write('  COMMAND ${EXE_NAME}\n')
-out.write(')\n')
