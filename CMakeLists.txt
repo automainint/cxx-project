@@ -1,57 +1,52 @@
 cmake_minimum_required(VERSION 3.18)
 
-option(CODE_COVERAGE "Enable coverage reporting" OFF)
+cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0091 NEW)
 
-set(PROJECT_NAME cxx-project)
-set(EXE_NAME cxx-project)
-set(CFG_COVERAGE config-coverage)
+option(CXXP_ENABLE_EXE "Enable executable" ON)
+option(CXXP_ENABLE_TESTING "Enable testing" OFF)
+option(CXXP_ENABLE_COVERAGE "Enable coverage reporting" OFF)
 
-project(${PROJECT_NAME} CXX)
+set(CXXP_PROJECT cxx-project)
+set(CXXP_EXE cxx-project)
+set(CXXP_CONFIG cxx-project-config)
+set(CXXP_SOCKETS cxx-project-sockets)
+set(CXXP_UNITTESTS cxx-project-unittests)
 
-find_package(Threads REQUIRED)
+project(
+  ${CXXP_PROJECT}
+    VERSION 0.0.1
+    DESCRIPTION "C++ project template."
+    LANGUAGES CXX
+)
 
-add_library(${CFG_COVERAGE} INTERFACE)
+include(cmake/fetch-deps.cmake)
 
-if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(${CFG_COVERAGE} INTERFACE -O0 -g --coverage)
-  target_link_options(${CFG_COVERAGE} INTERFACE --coverage)
+if(CXXP_ENABLE_EXE)
+  include(cmake/config.cmake)
+
+  add_executable(${CXXP_EXE})
+  add_subdirectory(source)
+
+  set_property(TARGET ${CXXP_EXE} PROPERTY CXX_STANDARD 20)
+
+  if(MSVC)
+    target_link_options(${CXXP_EXE} PRIVATE "/SUBSYSTEM:CONSOLE")
+  endif()
+
+  target_link_libraries(
+    ${CXXP_EXE}
+      ${CXXP_CONFIG} gtest
+  )
+
+  if(CXXP_ENABLE_TESTING OR CXXP_ENABLE_COVERAGE)
+    enable_testing()
+
+    add_test(
+      NAME ${CXXP_UNITTESTS}
+      COMMAND ${CXXP_EXE}
+    )
+  endif()
 endif()
 
-add_library(Sockets INTERFACE)
-
-if(WIN32)
-  target_compile_definitions(Sockets INTERFACE _CONSOLE UNICODE _UNICODE)
-  target_link_libraries(Sockets INTERFACE ws2_32)
-endif()
-
-add_executable(${EXE_NAME})
-
-add_subdirectory(source)
-
-set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 20)
-
-if(MSVC)
-  target_link_options(${EXE_NAME} PRIVATE "/SUBSYSTEM:CONSOLE")
-endif()
-
-target_link_libraries(
-  ${EXE_NAME}
-    ${CFG_COVERAGE} Threads::Threads gtest benchmark
-)
-
-target_link_directories(
-  ${EXE_NAME}
-    PUBLIC lib
-)
-
-target_include_directories(
-  ${EXE_NAME}
-    PUBLIC include
-)
-
-enable_testing()
-
-add_test(
-  NAME unittests
-  COMMAND ${EXE_NAME}
-)
+include(GNUInstallDirs)
