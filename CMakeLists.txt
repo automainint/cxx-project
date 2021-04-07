@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 
-cmake_policy(SET CMP0077 NEW)
-cmake_policy(SET CMP0091 NEW)
-
 # Allow to set up the options for
 # the dependencies.
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
@@ -20,9 +17,11 @@ set(CXXP_EXE        cxx-project)
 set(CXXP_CONFIG     cxx-project-config)
 set(CXXP_UNITTESTS  cxx-project-unittests)
 
+set(CMAKE_CXX_STANDARD 20)
+
 project(
   ${CXXP_PROJECT}
-    VERSION 0.0.1
+    VERSION 0.1.1
     DESCRIPTION "C++ project template."
     LANGUAGES CXX
 )
