@@ -2,15 +2,13 @@
 
 import os, glob
 
-target_name = "${CXXP_EXE}"
-
-def get_subdirs(folder):
+def get_subdirs(folder: str):
   dirs = list()
   for f in glob.glob(os.path.join(folder, '*', '')):
     dirs.append(os.path.basename(os.path.normpath(f)))
   return dirs
 
-def get_files(folder, ext):
+def get_files(folder: str, ext: str):
   files = list()
   for f in glob.glob(os.path.join(folder, ext)):
     files.append(os.path.basename(f))
@@ -22,7 +20,7 @@ def check_subdirs(folder):
       return True
   return False
 
-def print_list(s, offset):
+def print_list(s: list, offset: int):
   buf = ''
   char_count = offset
   for i in range(char_count - 1):
@@ -39,7 +37,7 @@ def print_list(s, offset):
     buf += ' ' + f    
   return buf
 
-def print_sources(folder):
+def print_sources(folder: str, target_name: str):
   buf = ''
   srcs = get_files(folder, '*.cpp')
   hdrs = get_files(folder, '*.h')
@@ -52,34 +50,32 @@ def print_sources(folder):
     buf += '\n)\n'
   return buf
 
-def print_subdirs(folder):
+def print_subdirs(folder: str):
   buf = ''
   dirs = get_subdirs(folder)
   for f in dirs:
     if check_subdirs(os.path.join(folder, f)):
-      if f == 'win32':
-        buf += 'if(WIN32)\n'
-        buf += '  add_subdirectory(' + f + ')\n'
-        buf += 'endif()\n'
-      else:
-        buf += 'add_subdirectory(' + f + ')\n'
+      buf += 'add_subdirectory(' + f + ')\n'
   return buf
 
-def write_subdirs(folder):
+def write_subdirs(folder: str, target_name: str):
   if check_subdirs(folder):
     out = open(os.path.join(folder, 'CMakeLists.txt'), 'w')
-    out.write(print_sources(folder))
+    out.write(print_sources(folder, target_name))
     out.write(print_subdirs(folder))
     out.close()
 
     for dir in get_subdirs(folder):
-      write_subdirs(os.path.join(folder, dir))
+      write_subdirs(os.path.join(folder, dir), target_name)
 
-def clean_subdirs(folder):
+def clean_subdirs(folder: str):
   for r, d, f in os.walk(folder):
     for file in f:
       if file == 'CMakeLists.txt':
         os.remove(os.path.join(r, file))
 
-clean_subdirs(os.path.join('..', 'source'))
-write_subdirs(os.path.join('..', 'source'))
+def gen_cmake(folder: str, target_name: str):
+  clean_subdirs(folder)
+  write_subdirs(folder, target_name)
+
+gen_cmake(os.path.join('..', 'source'), '${CXXP_EXE}')

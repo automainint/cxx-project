@@ -2,8 +2,6 @@
 /lib/**
 /include/**
 /build/**
-/thirdparty/*/
-!.placeholder
 
 /.vs/
 *.sln
