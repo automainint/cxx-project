@@ -52,6 +52,12 @@ if(CXXP_ENABLE_EXE)
       NAME ${CXXP_UNITTESTS}
       COMMAND ${CXXP_EXE}
     )
+
+    set_tests_properties(
+      ${CXXP_UNITTESTS}
+        PROPERTIES
+          TIMEOUT "40"
+    )
   endif()
 endif()
 
