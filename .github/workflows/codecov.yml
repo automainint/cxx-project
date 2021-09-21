@@ -40,7 +40,7 @@ jobs:
       run: ctest -V -C $BUILD_TYPE
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v2
       with:
         working-directory: ${{github.workspace}}/build
         fail_ci_if_error: true
