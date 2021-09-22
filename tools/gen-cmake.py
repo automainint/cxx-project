@@ -78,4 +78,8 @@ def gen_cmake(folder: str, target_name: str):
   clean_subdirs(folder)
   write_subdirs(folder, target_name)
 
-gen_cmake(os.path.join('..', 'source'), '${CXXP_EXE}')
+def main():
+  gen_cmake(os.path.join('..', 'source'), '${CXXP_EXE}')
+
+if __name__ == '__main__':
+  main()
