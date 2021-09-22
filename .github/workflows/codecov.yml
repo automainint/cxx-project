@@ -28,12 +28,14 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D CXXP_ENABLE_COVERAGE=ON -B build -S .
         cmake --build build --config $BUILD_TYPE
 
-    - name: Run tests
+    - name: Run tests & generate coverage
       working-directory: ${{github.workspace}}/build
-      run: ctest -V -C $BUILD_TYPE
+      run: |
+        ctest -V -C $BUILD_TYPE
+        gcovr -j $(nproc) --delete --root ../ --print-summary --xml-pretty --xml coverage.xml .
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        working-directory: ${{github.workspace}}/build
+        files: ${{github.workspace}}/build/coverage.xml
         fail_ci_if_error: true
