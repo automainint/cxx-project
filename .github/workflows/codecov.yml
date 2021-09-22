@@ -23,6 +23,10 @@ jobs:
       with:
         cmake-version: 3.18
 
+    - name: Set up gcovr
+      run: |
+        pip install gcovr
+
     - name: Build
       run: |
         cmake -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D CXXP_ENABLE_COVERAGE=ON -B build -S .
